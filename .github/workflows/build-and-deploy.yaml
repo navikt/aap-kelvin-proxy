@@ -1,0 +1,38 @@
+name: Bygg og deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  buildDev:
+    name: build
+    runs-on: ubuntu-latest
+    permissions:
+        contents: read
+        id-token: write
+        packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nais/docker-build-push@v0
+        with:
+          team: aap
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          image_suffix: -dev-gcp
+          tag: ${{ github.sha }}
+  deployDev:
+    needs: buildDev
+    uses: navikt/aap-workflows/.github/workflows/deploy.yml@main
+    permissions:
+      contents: read
+      id-token: write
+    secrets: inherit
+    with:
+      cluster: dev-gcp
+      manifest: .nais/dev-gcp.yaml
+      imageSuffix: -dev-gcp
