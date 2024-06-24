@@ -23,7 +23,7 @@ jobs:
           team: aap
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          image_suffix: -dev-gcp
+          image_suffix: dev-gcp
           tag: ${{ github.sha }}
   deployDev:
     needs: buildDev
